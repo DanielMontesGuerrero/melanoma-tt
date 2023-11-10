@@ -10,12 +10,17 @@ import Lesion from "@/models/lesion";
 import Remainder from "@/models/remainder";
 import Styles from "@/styles";
 import { getLesions, getRemainders } from "@/utils/testData";
+import {useGetLesionByIdQuery} from "@/services/melanomaApi";
 
 const Followup = () => {
   const navigation = useNavigation();
   const [isEditing, setIsEditing] = useState(false);
   const [lesions, setLesions] = useState<Lesion[]>([]);
   const [remainders, setRemainders] = useState<Remainder[]>([]);
+
+  const {data, isLoading, isError, error, endpointName} = useGetLesionByIdQuery(1);
+  
+  console.log(isLoading, data, isError, error, endpointName);
 
   useEffect(() => {
     navigation.setOptions({
