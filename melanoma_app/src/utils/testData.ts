@@ -22,11 +22,11 @@ export function getRemainders() {
 
 export function getPhotos(count: number) {
   const description =
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque pulvinar volutpat purus, in ultrices odio viverra eget. Duis pharetra dui quis arcu sollicitudin pharetra. Fusce eleifend, risus elementum suscipit commodo, tellus tellus ultricies tellus, ac pellentesque quam mi non purus. Duis posuere eros vitae quam vestibulum, vel feugiat tortor mattis. Duis elit ipsum, hendrerit at malesuada ut, sollicitudin at lorem. Phasellus ac est at tortor accumsan posuere. Vivamus finibus aliquet tellus in fermentum. Vestibulum ullamcorper risus sem, et euismod dui maximus eget. Donec varius urna sit amet nisi dictum ultricies. Vestibulum ullamcorper risus sem, et euismod dui maximus eget. Donec varius urna sit amet nisi dictum ultricies.";
+    "Esta foto la tomé despues de ir a la playa";
   const photos = [];
   const id = Math.floor(Math.random() * 4);
   for (let i = 0; i < count; i++) {
-    photos.push(new Photo(i, `photo${i}`, id, new Date(), description));
+    photos.push(new Photo(i, `photo${i}`, id, new Date(Date.now() - Math.random() * 10000000000), description));
   }
   return photos;
 }
@@ -66,7 +66,7 @@ export function getComparison(
     photos[0],
     photos[1],
     photos[2],
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In enim magna, scelerisque ut fringilla in, porta a ligula. Suspendisse sed felis nibh. Cras dapibus, lacus quis finibus scelerisque, augue lacus tincidunt tortor, nec facilisis urna magna vel nisi. Donec molestie scelerisque pharetra. Nunc dictum eros justo, non aliquam massa pretium vel. Nunc dignissim ornare lorem non malesuada. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aliquam a lorem eu massa venenatis ullamcorper sit amet a risus. Aenean porta eget libero in sodales.",
+    "Las lesiones de cáncer de melanoma tienen un alto procentaje de asimetría.",
     parameterName,
     beforeValue,
     afterValue
@@ -77,7 +77,7 @@ export function getPrediagnosisResult() {
   const image = { base64: RawImage.image };
   return new PrediagnosisResult(
     0.67,
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In enim magna, scelerisque ut fringilla in, porta a ligula. Suspendisse sed felis nibh. Cras dapibus, lacus quis finibus scelerisque, augue lacus tincidunt tortor, nec facilisis urna magna vel nisi. Donec molestie scelerisque pharetra. Nunc dictum eros justo, non aliquam massa pretium vel. Nunc dignissim ornare lorem non malesuada. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aliquam a lorem eu massa venenatis ullamcorper sit amet a risus. Aenean porta eget libero in sodales.",
+    "La lesión es poco probable de ser causada por cáncer de melanoma.",
     image
   );
 }

@@ -7,6 +7,16 @@ export const LesionImages = [
 
 export const Images = {
   notification: require("../../assets/img/notification.png"),
+  cnn: require("../../assets/img/cnn.png"),
+  gallery: require("../../assets/img/gallery.png"),
+  photo: require("../../assets/img/photo.png"),
+  search: require("../../assets/img/search.png"),
 };
 
-export const TutorialsImages = new Map([["notification", Images.notification]]);
+export const TutorialsImages = new Map([
+  ["notification", Images.notification],
+  ["cnn", Images.cnn],
+  ["gallery", Images.gallery],
+  ["photo", Images.photo],
+  ["search", Images.search],
+]);
