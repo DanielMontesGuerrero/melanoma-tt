@@ -21,12 +21,19 @@ export function getRemainders() {
 }
 
 export function getPhotos(count: number) {
-  const description =
-    "Esta foto la tomé despues de ir a la playa";
+  const description = "Esta foto la tomé despues de ir a la playa";
   const photos = [];
   const id = Math.floor(Math.random() * 4);
   for (let i = 0; i < count; i++) {
-    photos.push(new Photo(i, `photo${i}`, id, new Date(Date.now() - Math.random() * 10000000000), description));
+    photos.push(
+      new Photo(
+        i,
+        `photo${i}`,
+        id,
+        new Date(Date.now() - Math.random() * 10000000000),
+        description
+      )
+    );
   }
   return photos;
 }

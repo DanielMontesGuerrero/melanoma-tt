@@ -1,4 +1,7 @@
 export default interface User {
-  username: string;
+  userName: string;
+  password: string;
+  name: string;
+  lastName: string;
   hasWritePermission: boolean;
 }

@@ -1,14 +1,15 @@
 import CustomProviderProps from "./customProviderProps";
 import CurrentPictureMediaProvider from "./pictureMediaContext";
 import ReduxProvider from "./reduxProvider";
+import UserProvider from "./userContext";
 
 const Providers = ({ children }: CustomProviderProps) => {
   return (
-  <CurrentPictureMediaProvider>
-    <ReduxProvider>
-      {children}
-    </ReduxProvider>
-  </CurrentPictureMediaProvider>
+    <CurrentPictureMediaProvider>
+      <ReduxProvider>
+        <UserProvider>{children}</UserProvider>
+      </ReduxProvider>
+    </CurrentPictureMediaProvider>
   );
 };
 
