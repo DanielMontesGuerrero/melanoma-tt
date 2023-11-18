@@ -5,19 +5,30 @@ import { StyleSheet, View } from "react-native";
 import { EditButton } from "@/components/button";
 import TextEditModal from "@/components/editTextModal";
 import ImageDescription from "@/components/lesion/imageDescription";
+import Loading from "@/components/loading";
 import Section from "@/components/section";
 import ZoomeableImage from "@/components/zoomeableImage";
-import { LesionImages } from "@/utils/images";
-import { getLesions } from "@/utils/testData";
+import { useUser } from "@/contexts/userContext";
+import { lesionFromInterface } from "@/models/lesion";
+import { photoFromInterface } from "@/models/photo";
+import { useGetLesionQuery, useGetPhotoQuery } from "@/services/melanomaApi";
 
 const DetailedPhoto = () => {
   const params = useLocalSearchParams<{ id: string; photoId: string }>();
   const id = Number(params.id);
   const photoId = Number(params.photoId);
-  const lesion = getLesions()[id];
-  const photo = lesion.photos[photoId];
+  const { user } = useUser();
+  const { data: lesionData, isLoading: isLesionLoading } =
+    useGetLesionQuery(id);
+  const { data: photoData, isLoading: isPhotoLoading } =
+    useGetPhotoQuery(photoId);
+  const lesion = lesionFromInterface(lesionData, user);
+  const photo = photoFromInterface(photoData);
   const navigator = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+
+  console.log(photoData);
+  console.log(isLesionLoading, isPhotoLoading);
 
   useEffect(() => {
     if (lesion.userHasWriteNotesPermission) {
@@ -28,19 +39,20 @@ const DetailedPhoto = () => {
     navigator.setOptions({
       title: photo.createdOn.toLocaleString(),
     });
-  }, [navigator]);
+  }, [navigator, lesionData, photoData]);
 
   const Body = () => {
     return ImageDescription({ description: photo.description });
   };
 
+  if (isLesionLoading || isPhotoLoading) {
+    return <Loading />;
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.photoContainer}>
-        <ZoomeableImage
-          style={styles.image}
-          image={LesionImages[photo.localId]}
-        />
+        <ZoomeableImage style={styles.image} image={photo.image.data} />
       </View>
       <View style={styles.descriptionContainer}>
         <Section title="Notas" body={Body} />

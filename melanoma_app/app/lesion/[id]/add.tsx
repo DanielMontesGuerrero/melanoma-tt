@@ -1,25 +1,34 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { Redirect, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import { Text, View } from "react-native";
 
 import ImageLoading from "@/components/imageLoading";
 import { useCurrentPictureMedia } from "@/contexts/pictureMediaContext";
+import { usePostPhotoMutation } from "@/services/melanomaApi";
 import { NEW_LESION_ID } from "@/utils/constants";
 
 const Add = () => {
   const params = useLocalSearchParams<{ id: string }>();
   const { currentPictureMedia } = useCurrentPictureMedia();
+  const [postPhoto, { isLoading, isUninitialized }] = usePostPhotoMutation();
+  const lesionId = Number(params.id) === NEW_LESION_ID ? 0 : Number(params.id);
 
   useEffect(() => {
-    const lesionId = Number(params.id) === NEW_LESION_ID ? 0 : params.id;
-    setTimeout(() => {
-      router.replace({
-        pathname: "/lesion/[id]/",
-        params: {
-          id: lesionId,
+    if (currentPictureMedia.base64 !== undefined) {
+      console.log("Adding photo", lesionId);
+      postPhoto({
+        lesionId,
+        photo: {
+          name: "Nueva photo",
+          description: "Ingrese una descripción",
+          image: {
+            name: "photo",
+            ext: "jpg",
+            data: currentPictureMedia.base64,
+          },
         },
       });
-    }, 3000);
+    }
   }, []);
 
   if (!currentPictureMedia.uri) {
@@ -31,11 +40,17 @@ const Add = () => {
     );
   }
 
+  if (isLoading || isUninitialized) {
+    return (
+      <ImageLoading
+        image={{ uri: currentPictureMedia.uri }}
+        message="Añadiendo la foto"
+      />
+    );
+  }
+
   return (
-    <ImageLoading
-      image={{ uri: currentPictureMedia.uri }}
-      message="Añadiendo la foto"
-    />
+    <Redirect href={{ pathname: "/lesion/[id]/", params: { id: lesionId } }} />
   );
 };
 

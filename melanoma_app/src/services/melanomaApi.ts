@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import Lesion, { ILesion } from "@/models/lesion";
+import { IPhoto } from "@/models/photo";
 import User from "@/models/user";
 import {
   ApiResponse,
@@ -13,7 +14,7 @@ const baseUrl = "http://192.168.100.82:3000/";
 export const melanomaApi = createApi({
   reducerPath: "melanomaApi",
   baseQuery: fetchBaseQuery({ baseUrl }),
-  tagTypes: ["User", "Lesion"],
+  tagTypes: ["User", "Lesion", "Photo"],
   endpoints: (builder) => ({
     postUser: builder.mutation<PostUserResponse, User>({
       query: (user) => ({
@@ -70,6 +71,28 @@ export const melanomaApi = createApi({
       }),
       invalidatesTags: ["Lesion"],
     }),
+    postPhoto: builder.mutation<
+      ApiResponse,
+      { lesionId: number; photo: Partial<IPhoto> }
+    >({
+      query: ({ lesionId, photo }) => ({
+        url: `lesion/${lesionId}/photo`,
+        method: "post",
+        body: photo,
+      }),
+      invalidatesTags: ["Lesion"],
+    }),
+    getPhoto: builder.query<IPhoto, number>({
+      query: (photoId) => `/lesion/0/photo/${photoId}`,
+      providesTags: ["Photo"],
+    }),
+    deletePhoto: builder.mutation<ApiResponse, number>({
+      query: (photoId) => ({
+        url: `lesion/0/photo/${photoId}`,
+        method: "delete",
+      }),
+      invalidatesTags: ["Lesion"],
+    }),
   }),
 });
 
@@ -81,4 +104,7 @@ export const {
   useDeleteLesionMutation,
   useGetLesionQuery,
   usePatchLesionMutation,
+  useGetPhotoQuery,
+  usePostPhotoMutation,
+  useDeletePhotoMutation,
 } = melanomaApi;

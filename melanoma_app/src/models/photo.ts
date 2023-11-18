@@ -34,7 +34,10 @@ export interface IPhoto {
   image: Image;
 }
 
-export function photoFromInterface(photo: IPhoto) {
+export function photoFromInterface(photo: IPhoto | null | undefined) {
+  if (photo === undefined || photo === null) {
+    return new Photo(0, "", 0, new Date(), "", { ext: "", name: "", data: "" });
+  }
   return new Photo(
     photo.id,
     photo.name,
