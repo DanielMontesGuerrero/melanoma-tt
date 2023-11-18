@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+import Lesion, { ILesion } from "@/models/lesion";
 import User from "@/models/user";
 import {
   ApiResponse,
@@ -54,6 +55,21 @@ export const melanomaApi = createApi({
       }),
       invalidatesTags: ["Lesion", "User"],
     }),
+    getLesion: builder.query<ILesion, number>({
+      query: (lesionId) => `lesion/${lesionId}`,
+      providesTags: ["Lesion"],
+      // transformResponse: (lesion: ILesion) => {
+      //   return new Lesion(lesion.id, lesion.name, lesion.photos, "Uknown", [], true);
+      // },
+    }),
+    patchLesion: builder.mutation<ApiResponse, Partial<Lesion>>({
+      query: (lesion) => ({
+        url: `lesion/${lesion.id}`,
+        method: "patch",
+        body: lesion,
+      }),
+      invalidatesTags: ["Lesion"],
+    }),
   }),
 });
 
@@ -63,4 +79,6 @@ export const {
   useLazyPostLoginQuery,
   useGetUserQuery,
   useDeleteLesionMutation,
+  useGetLesionQuery,
+  usePatchLesionMutation,
 } = melanomaApi;

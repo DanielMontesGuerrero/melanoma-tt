@@ -8,8 +8,7 @@ import RemainderCarousel from "@/components/home/followup/remainderCarousel";
 import Loading from "@/components/loading";
 import Section from "@/components/section";
 import { useUser } from "@/contexts/userContext";
-import Lesion from "@/models/lesion";
-import Photo from "@/models/photo";
+import { lesionFromInterface } from "@/models/lesion";
 import Remainder from "@/models/remainder";
 import { useGetUserQuery } from "@/services/melanomaApi";
 import Styles from "@/styles";
@@ -51,24 +50,7 @@ const Followup = () => {
 
   const Lesions = () => {
     const currLesions = (data?.lesions ?? []).map((ilesion) => {
-      const photos = (ilesion?.photos ?? []).map((iphoto) => {
-        return new Photo(
-          iphoto.id,
-          iphoto.name,
-          0,
-          new Date(iphoto.createdAt),
-          iphoto.description,
-          iphoto.image
-        );
-      });
-      return new Lesion(
-        ilesion.id,
-        ilesion.name,
-        photos,
-        user?.userName,
-        [],
-        true
-      );
+      return lesionFromInterface(ilesion, user);
     });
     return LesionsOverview({ lesions: currLesions, isEditing });
   };

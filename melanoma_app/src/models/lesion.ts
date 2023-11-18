@@ -1,4 +1,4 @@
-import Photo, { IPhoto } from "./photo";
+import Photo, { IPhoto, photoFromInterface } from "./photo";
 import User from "./user";
 
 export default class Lesion {
@@ -28,20 +28,20 @@ export default class Lesion {
       ? true
       : userHasWriteNotesPermission ?? false;
   }
+}
 
-  getLastUpdatedLabel() {
-    let minDate = new Date(0);
-    this.photos.forEach((photo: Photo) => {
-      if (minDate < photo.createdOn) {
-        minDate = photo.createdOn;
-      }
-    });
-    return minDate.toLocaleDateString();
-  }
+export function getLastUpdatedLabel(lesion: Lesion) {
+  let minDate = new Date(0);
+  lesion.photos.forEach((photo: Photo) => {
+    if (minDate < photo.createdOn) {
+      minDate = photo.createdOn;
+    }
+  });
+  return minDate.toLocaleDateString();
+}
 
-  getFirstPhoto(): Photo | undefined {
-    return this.photos[0];
-  }
+export function getFirstPhoto(lesion: Lesion): Photo | undefined {
+  return lesion.photos[0];
 }
 
 export interface ILesion {
@@ -49,4 +49,15 @@ export interface ILesion {
   name: string;
   idUser: number;
   photos: IPhoto[];
+}
+
+export function lesionFromInterface(
+  lesion: ILesion | undefined | null,
+  user: User | undefined | null
+) {
+  if (lesion === undefined || lesion == null) return new Lesion(0, "", []);
+  const photos = (lesion.photos ?? []).map((photo) =>
+    photoFromInterface(photo)
+  );
+  return new Lesion(lesion.id, lesion.name, photos, user?.userName, [], false);
 }

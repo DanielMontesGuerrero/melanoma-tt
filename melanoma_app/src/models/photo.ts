@@ -33,3 +33,14 @@ export interface IPhoto {
   lesionId: number;
   image: Image;
 }
+
+export function photoFromInterface(photo: IPhoto) {
+  return new Photo(
+    photo.id,
+    photo.name,
+    0,
+    new Date(photo.createdAt),
+    photo.description,
+    photo.image
+  );
+}

@@ -5,7 +5,11 @@ import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import ColorPallete from "../../../colorPallete";
-import { default as LesionModel } from "../../../models/lesion";
+import {
+  default as LesionModel,
+  getFirstPhoto,
+  getLastUpdatedLabel,
+} from "../../../models/lesion";
 import Styles from "../../../styles";
 import { Images } from "../../../utils/images";
 
@@ -21,7 +25,7 @@ interface LesionProps {
 const LesionItem = (props: LesionProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [deleteLesionTrigger, result] = useDeleteLesionMutation();
-  const thumbnail = props.lesion.getFirstPhoto();
+  const thumbnail = getFirstPhoto(props.lesion);
 
   const deleteLesion = () => {
     deleteLesionTrigger(props.lesion.id);
@@ -58,9 +62,7 @@ const LesionItem = (props: LesionProps) => {
         )}
       </View>
       <View style={styles.dateContainer}>
-        <Text style={Styles.textBody}>
-          {props.lesion.getLastUpdatedLabel()}
-        </Text>
+        <Text style={Styles.textBody}>{getLastUpdatedLabel(props.lesion)}</Text>
       </View>
       <View style={styles.iconContainer}>
         {props.isEditing ? (
