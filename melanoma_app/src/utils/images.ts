@@ -11,6 +11,7 @@ export const Images = {
   gallery: require("../../assets/img/gallery.png"),
   photo: require("../../assets/img/photo.png"),
   search: require("../../assets/img/search.png"),
+  noImage: require("../../assets/img/no_image.jpg"),
 };
 
 export const TutorialsImages = new Map([

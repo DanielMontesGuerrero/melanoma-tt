@@ -1,13 +1,17 @@
 import { Entypo } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { Fragment } from "react";
+import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import ColorPallete from "../../../colorPallete";
 import { default as LesionModel } from "../../../models/lesion";
 import Styles from "../../../styles";
-import { LesionImages } from "../../../utils/images";
+import { Images } from "../../../utils/images";
+
+import ConfirmationModal from "@/components/confirmationModal";
+import Loading from "@/components/loading";
+import { useDeleteLesionMutation } from "@/services/melanomaApi";
 
 interface LesionProps {
   lesion: LesionModel;
@@ -15,11 +19,23 @@ interface LesionProps {
 }
 
 const LesionItem = (props: LesionProps) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [deleteLesionTrigger, result] = useDeleteLesionMutation();
+  const thumbnail = props.lesion.getFirstPhoto();
+
+  const deleteLesion = () => {
+    deleteLesionTrigger(props.lesion.id);
+  };
+
+  if (result.isLoading) {
+    return <Loading />;
+  }
+
   return (
     <View style={styles.container}>
       <View style={[Styles.photoContainer, styles.customPhotoContainer]}>
         <Image
-          source={LesionImages[props.lesion.getFirstPhoto().localId]}
+          source={thumbnail?.image.data ?? Images.noImage}
           style={styles.image}
           contentFit="cover"
           contentPosition="center"
@@ -48,7 +64,10 @@ const LesionItem = (props: LesionProps) => {
       </View>
       <View style={styles.iconContainer}>
         {props.isEditing ? (
-          <TouchableOpacity style={styles.touchContainer}>
+          <TouchableOpacity
+            style={styles.touchContainer}
+            onPress={() => setIsModalVisible(true)}
+          >
             <Entypo name="cross" size={20} color="red" />
           </TouchableOpacity>
         ) : (
@@ -71,6 +90,12 @@ const LesionItem = (props: LesionProps) => {
           </Link>
         )}
       </View>
+      <ConfirmationModal
+        visible={isModalVisible}
+        message="¿Etás seguro que deseas eliminar la lesión? Esta operación no se puede deshacer"
+        onConfirmation={deleteLesion}
+        onCancel={() => setIsModalVisible(false)}
+      />
     </View>
   );
 };

@@ -6,3 +6,8 @@ export interface PostUserResponse {
 export interface PostLoginResponse {
   user: PostUserResponse;
 }
+
+export interface ApiResponse {
+  result: boolean;
+  message: string;
+}

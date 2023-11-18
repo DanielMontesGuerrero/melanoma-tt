@@ -4,6 +4,8 @@ import reminderRouter from './reminder';
 import '../../lib/passport';
 import Crypto from 'crypto';
 import passport from 'passport';
+import Lesion from '../../models/lesion.model';
+import Photo from '../../models/photo.model';
 
 const userRouter = Router();
 
@@ -39,12 +41,20 @@ userRouter.get('/', (async (req, res, next) => {
 }) as RequestHandler);
 
 userRouter.get('/:idUser', (async (req, res, next) => {
-  User.findOne({ where: { id: req.params.idUser } })
-    .then((user) => {
+  User.findOne({ where: { id: req.params.idUser }, include: [{model: Lesion, include: [{model: Photo}]}] })
+    .then(async (user) => {
       if (!user) {
         return res
           .status(401)
           .send(`The user ${req.params.idUser} wasn't found `);
+      }
+      if (user.lesions === undefined) {
+        user.lesions = [];
+      }
+      for (const lesion of user.lesions) {
+        for await (const photo of lesion.photos) {
+          await Photo.setImage(photo);
+        }
       }
       const response = {
         username: user.userName,
@@ -52,6 +62,7 @@ userRouter.get('/:idUser', (async (req, res, next) => {
         lastname: user.lastName,
         id: user.id,
         reminders: user.reminders,
+        lesions: user.lesions,
       };
       return res.json(response);
     })

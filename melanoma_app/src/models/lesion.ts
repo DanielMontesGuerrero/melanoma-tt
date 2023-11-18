@@ -1,4 +1,4 @@
-import Photo from "./photo";
+import Photo, { IPhoto } from "./photo";
 import User from "./user";
 
 export default class Lesion {
@@ -39,7 +39,14 @@ export default class Lesion {
     return minDate.toLocaleDateString();
   }
 
-  getFirstPhoto() {
+  getFirstPhoto(): Photo | undefined {
     return this.photos[0];
   }
+}
+
+export interface ILesion {
+  id: number;
+  name: string;
+  idUser: number;
+  photos: IPhoto[];
 }

@@ -18,7 +18,7 @@ import { getLesions } from "@/utils/testData";
 
 const LesionDetail = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const lesionIndex = Number(id || "");
+  const lesionIndex = 0;
   const lesions = getLesions();
   const lesion = lesions[lesionIndex];
   const navigation = useNavigation();

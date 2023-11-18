@@ -5,17 +5,22 @@ import { View, StyleSheet, InteractionManager } from "react-native";
 import { EditButton, SaveButton } from "@/components/button";
 import LesionsOverview from "@/components/home/followup/lesionsOverview";
 import RemainderCarousel from "@/components/home/followup/remainderCarousel";
+import Loading from "@/components/loading";
 import Section from "@/components/section";
+import { useUser } from "@/contexts/userContext";
 import Lesion from "@/models/lesion";
+import Photo from "@/models/photo";
 import Remainder from "@/models/remainder";
+import { useGetUserQuery } from "@/services/melanomaApi";
 import Styles from "@/styles";
-import { getLesions, getRemainders } from "@/utils/testData";
+import { getRemainders } from "@/utils/testData";
 
 const Followup = () => {
   const navigation = useNavigation();
   const [isEditing, setIsEditing] = useState(false);
-  const [lesions, setLesions] = useState<Lesion[]>([]);
   const [remainders, setRemainders] = useState<Remainder[]>([]);
+  const { user } = useUser();
+  const { data, isLoading } = useGetUserQuery(user?.id ?? 0);
 
   useEffect(() => {
     navigation.setOptions({
@@ -34,7 +39,6 @@ const Followup = () => {
     });
 
     const task = InteractionManager.runAfterInteractions(() => {
-      setLesions(getLesions());
       setRemainders(getRemainders());
     });
 
@@ -46,8 +50,32 @@ const Followup = () => {
   };
 
   const Lesions = () => {
-    return LesionsOverview({ lesions, isEditing });
+    const currLesions = (data?.lesions ?? []).map((ilesion) => {
+      const photos = (ilesion?.photos ?? []).map((iphoto) => {
+        return new Photo(
+          iphoto.id,
+          iphoto.name,
+          0,
+          new Date(iphoto.createdAt),
+          iphoto.description,
+          iphoto.image
+        );
+      });
+      return new Lesion(
+        ilesion.id,
+        ilesion.name,
+        photos,
+        user?.userName,
+        [],
+        true
+      );
+    });
+    return LesionsOverview({ lesions: currLesions, isEditing });
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <View style={Styles.flexContainer}>

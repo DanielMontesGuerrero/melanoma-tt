@@ -9,10 +9,11 @@ import {
 } from "react-native";
 
 import Button from "../button";
+import Loading from "../loading";
 
 import Alert from "@/Alert";
 import ColorPallete from "@/colorPallete";
-import { userUser } from "@/contexts/userContext";
+import { useUser } from "@/contexts/userContext";
 import {
   useLazyPostLoginQuery,
   usePostUserMutation,
@@ -28,7 +29,7 @@ const LoginForm = ({ onRegisterPressed }: LoginFormProps) => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [postLogin, result] = useLazyPostLoginQuery();
-  const { setUser } = userUser();
+  const { setUser } = useUser();
 
   const login = () => {
     if (userName === "" || password === "") {
@@ -37,6 +38,7 @@ const LoginForm = ({ onRegisterPressed }: LoginFormProps) => {
     }
 
     postLogin({
+      id: 0,
       userName: userName.trim(),
       password: password.trim(),
       lastName: "",
@@ -62,11 +64,7 @@ const LoginForm = ({ onRegisterPressed }: LoginFormProps) => {
   };
 
   if (result.isLoading) {
-    return (
-      <View style={Styles.centeredContainer}>
-        <ActivityIndicator size="large" color={ColorPallete.blue.normal} />
-      </View>
-    );
+    return <Loading />;
   }
 
   return (
@@ -125,6 +123,7 @@ const RegisterForm = ({ onLoginPressed }: RegisterFormProps) => {
       return;
     }
     postUser({
+      id: 0,
       userName: userName.trim(),
       name: name.trim(),
       lastName: lastName.trim(),
