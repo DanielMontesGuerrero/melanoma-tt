@@ -86,6 +86,14 @@ export const melanomaApi = createApi({
       query: (photoId) => `/lesion/0/photo/${photoId}`,
       providesTags: ["Photo"],
     }),
+    patchPhoto: builder.mutation<ApiResponse, Partial<IPhoto>>({
+      query: (photo) => ({
+        url: `lesion/0/photo/${photo.id}`,
+        method: "patch",
+        body: photo,
+      }),
+      invalidatesTags: ["Photo"],
+    }),
     deletePhoto: builder.mutation<ApiResponse, number>({
       query: (photoId) => ({
         url: `lesion/0/photo/${photoId}`,
@@ -107,4 +115,5 @@ export const {
   useGetPhotoQuery,
   usePostPhotoMutation,
   useDeletePhotoMutation,
+  usePatchPhotoMutation,
 } = melanomaApi;

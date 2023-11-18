@@ -11,7 +11,11 @@ import ZoomeableImage from "@/components/zoomeableImage";
 import { useUser } from "@/contexts/userContext";
 import { lesionFromInterface } from "@/models/lesion";
 import { photoFromInterface } from "@/models/photo";
-import { useGetLesionQuery, useGetPhotoQuery } from "@/services/melanomaApi";
+import {
+  useGetLesionQuery,
+  useGetPhotoQuery,
+  usePatchPhotoMutation,
+} from "@/services/melanomaApi";
 
 const DetailedPhoto = () => {
   const params = useLocalSearchParams<{ id: string; photoId: string }>();
@@ -26,9 +30,8 @@ const DetailedPhoto = () => {
   const photo = photoFromInterface(photoData);
   const navigator = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
-
-  console.log(photoData);
-  console.log(isLesionLoading, isPhotoLoading);
+  const [pathLesionTrigger, { isLoading: isUpdateLoading }] =
+    usePatchPhotoMutation();
 
   useEffect(() => {
     if (lesion.userHasWriteNotesPermission) {
@@ -41,11 +44,19 @@ const DetailedPhoto = () => {
     });
   }, [navigator, lesionData, photoData]);
 
+  const updatePhotoDescription = (val: string) => {
+    pathLesionTrigger({
+      id: photo.id,
+      description: val,
+    });
+    setModalVisible(false);
+  };
+
   const Body = () => {
     return ImageDescription({ description: photo.description });
   };
 
-  if (isLesionLoading || isPhotoLoading) {
+  if (isLesionLoading || isPhotoLoading || isUpdateLoading) {
     return <Loading />;
   }
 
@@ -61,6 +72,7 @@ const DetailedPhoto = () => {
         value={photo.description}
         visible={modalVisible}
         onCancel={() => setModalVisible(false)}
+        onSave={updatePhotoDescription}
       />
     </View>
   );
