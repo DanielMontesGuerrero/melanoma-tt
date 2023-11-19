@@ -5,14 +5,20 @@ import { StyleSheet, Text, View } from "react-native";
 
 import Button from "@/components/button";
 import { AddPhotoIcon } from "@/components/icons";
+import { useUser } from "@/contexts/userContext";
+import { lesionFromInterface } from "@/models/lesion";
+import { useGetUserQuery } from "@/services/melanomaApi";
 import Styles from "@/styles";
 import PhotoRedirectOptions from "@/utils/PhotoRedirectOptions";
 import { NEW_LESION_ID } from "@/utils/constants";
-import { getLesions } from "@/utils/testData";
 
 const LesionBody = () => {
-  const lesions = getLesions();
-  const [selectedLesionId, setSelectedLesionId] = useState(lesions[0].id);
+  const { user } = useUser();
+  const { data } = useGetUserQuery(user?.id ?? 0);
+  const lesions = (data?.lesions ?? []).map((lesion) =>
+    lesionFromInterface(lesion, user)
+  );
+  const [selectedLesionId, setSelectedLesionId] = useState(lesions[0]?.id ?? 0);
 
   const options = lesions.map((lesion) => {
     return (

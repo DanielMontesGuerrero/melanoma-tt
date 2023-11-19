@@ -1,23 +1,33 @@
 import { Redirect, useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
 import ImageLoading from "@/components/imageLoading";
 import { useCurrentPictureMedia } from "@/contexts/pictureMediaContext";
-import { usePostPhotoMutation } from "@/services/melanomaApi";
+import { useUser } from "@/contexts/userContext";
+import {
+  usePostLesionMutation,
+  usePostPhotoMutation,
+} from "@/services/melanomaApi";
+import { PostLesionResponse } from "@/types/melanomaApiTypes";
 import { NEW_LESION_ID } from "@/utils/constants";
 
 const Add = () => {
   const params = useLocalSearchParams<{ id: string }>();
   const { currentPictureMedia } = useCurrentPictureMedia();
-  const [postPhoto, { isLoading, isUninitialized }] = usePostPhotoMutation();
-  const lesionId = Number(params.id) === NEW_LESION_ID ? 0 : Number(params.id);
+  const { user } = useUser();
+  const [postPhotoTrigger, { isLoading: isPostPhotoLoading, isUninitialized }] =
+    usePostPhotoMutation();
+  const [postLesionTrigger, { isLoading: isPostLesionLoading }] =
+    usePostLesionMutation();
+  const [lesionId, setLesionId] = useState(
+    Number(params.id) === NEW_LESION_ID ? NEW_LESION_ID : Number(params.id)
+  );
 
-  useEffect(() => {
+  const postPhoto = (addTolesionId: number) => {
     if (currentPictureMedia.base64 !== undefined) {
-      console.log("Adding photo", lesionId);
-      postPhoto({
-        lesionId,
+      postPhotoTrigger({
+        lesionId: addTolesionId,
         photo: {
           name: "Nueva photo",
           description: "Ingrese una descripción",
@@ -28,6 +38,19 @@ const Add = () => {
           },
         },
       });
+    }
+  };
+
+  useEffect(() => {
+    if (lesionId === NEW_LESION_ID) {
+      postLesionTrigger(user?.id ?? 0)
+        .then((response: { data: PostLesionResponse }) => {
+          setLesionId(response.data.id);
+          postPhoto(response.data.id);
+        })
+        .catch((error) => console.log(error));
+    } else {
+      postPhoto(lesionId);
     }
   }, []);
 
@@ -40,7 +63,7 @@ const Add = () => {
     );
   }
 
-  if (isLoading || isUninitialized) {
+  if (isPostPhotoLoading || isPostLesionLoading || isUninitialized) {
     return (
       <ImageLoading
         image={{ uri: currentPictureMedia.uri }}

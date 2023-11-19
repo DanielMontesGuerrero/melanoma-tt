@@ -6,6 +6,7 @@ import { IReminder } from "@/models/reminder";
 import User from "@/models/user";
 import {
   ApiResponse,
+  PostLesionResponse,
   PostLoginResponse,
   PostUserResponse,
 } from "@/types/melanomaApiTypes";
@@ -49,6 +50,19 @@ export const melanomaApi = createApi({
           lesions,
         };
       },
+    }),
+    postLesion: builder.mutation<PostLesionResponse, number>({
+      query: (userId) => ({
+        url: "lesion",
+        method: "post",
+        body: {
+          name: "Lesión recien creada",
+          owner: {
+            id: userId,
+          },
+        },
+      }),
+      invalidatesTags: ["User"],
     }),
     deleteLesion: builder.mutation<ApiResponse, number>({
       query: (lesionId) => ({
@@ -138,4 +152,5 @@ export const {
   useLazyGetUserQuery,
   usePostReminderMutation,
   useDeleteReminderMutation,
+  usePostLesionMutation,
 } = melanomaApi;

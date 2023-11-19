@@ -11,3 +11,9 @@ export interface ApiResponse {
   result: boolean;
   message: string;
 }
+
+export interface PostLesionResponse {
+  result: boolean;
+  message: string;
+  id: number;
+}
