@@ -2,6 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import Lesion, { ILesion } from "@/models/lesion";
 import { IPhoto } from "@/models/photo";
+import { IReminder } from "@/models/reminder";
 import User from "@/models/user";
 import {
   ApiResponse,
@@ -14,7 +15,7 @@ const baseUrl = "http://192.168.100.82:3000/";
 export const melanomaApi = createApi({
   reducerPath: "melanomaApi",
   baseQuery: fetchBaseQuery({ baseUrl }),
-  tagTypes: ["User", "Lesion", "Photo"],
+  tagTypes: ["User", "Lesion", "Photo", "Reminder"],
   endpoints: (builder) => ({
     postUser: builder.mutation<PostUserResponse, User>({
       query: (user) => ({
@@ -33,7 +34,7 @@ export const melanomaApi = createApi({
     }),
     getUser: builder.query<User, number>({
       query: (userId) => `user/${userId}`,
-      providesTags: ["User", "Lesion"],
+      providesTags: ["User", "Lesion", "Reminder"],
       transformResponse: (data: User) => {
         const lesions = data.lesions?.map((lesion) => {
           return {
@@ -101,6 +102,24 @@ export const melanomaApi = createApi({
       }),
       invalidatesTags: ["Lesion"],
     }),
+    postReminder: builder.mutation<
+      ApiResponse,
+      { idUser: number; idLesion: number; reminder: Partial<IReminder> }
+    >({
+      query: ({ idUser, idLesion, reminder }) => ({
+        url: `user/${idUser}/reminder/${idLesion}`,
+        method: "post",
+        body: reminder,
+      }),
+      invalidatesTags: ["Reminder"],
+    }),
+    deleteReminder: builder.mutation<ApiResponse, number>({
+      query: (idReminder) => ({
+        url: `user/0/reminder/${idReminder}`,
+        method: "delete",
+      }),
+      invalidatesTags: ["Reminder"],
+    }),
   }),
 });
 
@@ -116,4 +135,7 @@ export const {
   usePostPhotoMutation,
   useDeletePhotoMutation,
   usePatchPhotoMutation,
+  useLazyGetUserQuery,
+  usePostReminderMutation,
+  useDeleteReminderMutation,
 } = melanomaApi;

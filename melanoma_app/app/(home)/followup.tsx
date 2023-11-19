@@ -9,15 +9,13 @@ import Loading from "@/components/loading";
 import Section from "@/components/section";
 import { useUser } from "@/contexts/userContext";
 import { lesionFromInterface } from "@/models/lesion";
-import Remainder from "@/models/remainder";
+import { reminderFromInterface } from "@/models/reminder";
 import { useGetUserQuery } from "@/services/melanomaApi";
 import Styles from "@/styles";
-import { getRemainders } from "@/utils/testData";
 
 const Followup = () => {
   const navigation = useNavigation();
   const [isEditing, setIsEditing] = useState(false);
-  const [remainders, setRemainders] = useState<Remainder[]>([]);
   const { user } = useUser();
   const { data, isLoading } = useGetUserQuery(user?.id ?? 0);
 
@@ -38,21 +36,24 @@ const Followup = () => {
     });
 
     const task = InteractionManager.runAfterInteractions(() => {
-      setRemainders(getRemainders());
+      // setRemainders(getRemainders());
     });
 
     return () => task.cancel();
   }, [navigation, isEditing]);
 
   const Remainders = () => {
-    return RemainderCarousel({ remainders });
+    const reminders = (data?.reminders ?? []).map((reminder) =>
+      reminderFromInterface(reminder)
+    );
+    return RemainderCarousel({ reminders });
   };
 
   const Lesions = () => {
-    const currLesions = (data?.lesions ?? []).map((ilesion) => {
+    const lesions = (data?.lesions ?? []).map((ilesion) => {
       return lesionFromInterface(ilesion, user);
     });
-    return LesionsOverview({ lesions: currLesions, isEditing });
+    return LesionsOverview({ lesions, isEditing });
   };
 
   if (isLoading) {

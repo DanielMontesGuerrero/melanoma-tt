@@ -2,7 +2,7 @@ import RawImage from "@assets/data/testBase64Image.json";
 
 import Lesion from "../models/lesion";
 import Photo from "../models/photo";
-import Remainder from "../models/remainder";
+import Reminder from "../models/reminder";
 
 import Comparison from "@/models/comparison";
 import PrediagnosisResult from "@/models/prediagnosisResult";
@@ -12,10 +12,10 @@ export function getRemainders() {
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
   const remainders = [
-    new Remainder("Brazo", today),
-    new Remainder("Pierna", today),
-    new Remainder("Estomago", tomorrow),
-    new Remainder("Mano derecha", tomorrow),
+    new Reminder("Brazo", today),
+    new Reminder("Pierna", today),
+    new Reminder("Estomago", tomorrow),
+    new Reminder("Mano derecha", tomorrow),
   ];
   return remainders;
 }
