@@ -42,4 +42,7 @@ export default class Reminder extends Model {
 
   @BelongsTo(() => User)
     user!: User;
+
+  @BelongsTo(() => Lesion)
+    lesion!: Lesion;
 }

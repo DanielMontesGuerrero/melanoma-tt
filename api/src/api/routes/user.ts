@@ -6,6 +6,7 @@ import Crypto from 'crypto';
 import passport from 'passport';
 import Lesion from '../../models/lesion.model';
 import Photo from '../../models/photo.model';
+import Reminder from '../../models/reminder.model';
 
 const userRouter = Router();
 
@@ -41,7 +42,13 @@ userRouter.get('/', (async (req, res, next) => {
 }) as RequestHandler);
 
 userRouter.get('/:idUser', (async (req, res, next) => {
-  User.findOne({ where: { id: req.params.idUser }, include: [{model: Lesion, include: [{model: Photo}]}] })
+  User.findOne({
+    where: { id: req.params.idUser },
+    include: [
+      { model: Lesion, include: [{ model: Photo }] },
+      { model: Reminder, include: [{ model: Lesion, attributes: ['name'] }] },
+    ],
+  })
     .then(async (user) => {
       if (!user) {
         return res

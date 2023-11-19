@@ -19,6 +19,7 @@ export const postLesion = async (options: LesionPostRequestOptions) => {
       data: {
         result: true,
         message: 'Ok',
+        id: lesion.id,
       },
     };
   } catch (error) {
