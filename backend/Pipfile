@@ -15,6 +15,12 @@ pandas = "*"
 seaborn = "*"
 tk = "*"
 tkintertable = "*"
+opencv-contrib-python = "*"
+python-dotenv = "*"
+pyyaml = "*"
+azure-storage-blob = "*"
+azure-identity = "*"
+azure-keyvault-secrets = "*"
 
 [dev-packages]
 pylint = "*"

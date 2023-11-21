@@ -1,12 +1,14 @@
 import User from '../../models/user.model';
 import { type RequestHandler, Router } from 'express';
 import Reminder from '../../models/reminder.model';
+import Lesion from '../../models/lesion.model';
 import reminderRouter from './reminder';
 import '../../lib/passport';
 import Crypto from 'crypto';
 import passport from 'passport';
 import PatientRelationship from '../../models/patientRelationship.model';
 import log from '../../lib/logger';
+import Photo from '../../models/photo.model';
 
 const userRouter = Router();
 
@@ -35,7 +37,27 @@ userRouter.post('/', (async (req, res, next) => {
 
 userRouter.get('/', (async (req, res, next) => {
   try {
-    res.json(await User.findAll());
+    res.json(
+      await User.findAll({
+        include: [
+          Reminder,
+          {
+            model: User,
+            as: 'patients',
+            through: {
+              attributes: [],
+            },
+            attributes: ['id', 'userName'],
+          },
+          Lesion,
+          {
+            model: Lesion,
+            as: 'lesions',
+            attributes: ['id', 'name'],
+          },
+        ],
+      }),
+    );
   } catch (e) {
     next(e);
   }
@@ -47,7 +69,10 @@ userRouter.get('/:idUser', (async (req, res, next) => {
   User.findOne({
     where: { id: req.params.idUser },
     include: [
-      Reminder,
+      {
+        model: Reminder,
+        include: [{ model: Lesion, attributes: ['name'] }],
+      },
       {
         model: User,
         as: 'patients',
@@ -56,13 +81,25 @@ userRouter.get('/:idUser', (async (req, res, next) => {
         },
         attributes: ['id', 'userName'],
       },
+      {
+        model: Lesion,
+        include: [{ model: Photo }],
+      },
     ],
   })
-    .then((user) => {
+    .then(async (user) => {
       if (!user) {
         return res
           .status(401)
           .send(`The user ${req.params.idUser} wasn't found `);
+      }
+      if (user.lesions === undefined) {
+        user.lesions = [];
+      }
+      for (const lesion of user.lesions) {
+        for await (const photo of lesion.photos) {
+          await Photo.setImage(photo);
+        }
       }
       const response = {
         username: user.userName,
@@ -71,6 +108,7 @@ userRouter.get('/:idUser', (async (req, res, next) => {
         id: user.id,
         reminders: user.reminders,
         patients: user.patients,
+        lesions: user.lesions,
       };
       return res.json(response);
     })
@@ -85,7 +123,9 @@ userRouter.patch('/:idUser', (async (req, res, next) => {
     body.hash = pass.hash;
     body.salt = pass.salt;
   }
-  body.userName = body.userName.toLocaleLowerCase();
+  if ('userName' in body) {
+    body.userName = body.userName.toLocaleLowerCase();
+  }
   User.update(body, { where: { id: req.params.idUser } })
     .then(() => {
       res
