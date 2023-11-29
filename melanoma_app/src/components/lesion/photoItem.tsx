@@ -8,7 +8,11 @@ import { default as PhotoModel } from "../../models/photo";
 import Styles from "../../styles";
 import Loading from "../loading";
 
-import { useDeletePhotoMutation } from "@/services/melanomaApi";
+import {
+  useDeletePhotoMutation,
+  useGetPhotoQuery,
+} from "@/services/melanomaApi";
+import { Images } from "@/utils/images";
 
 interface PhotoItemProps {
   photo: PhotoModel;
@@ -18,6 +22,7 @@ interface PhotoItemProps {
 const PhotoItem = (props: PhotoItemProps) => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [deletePhotoTrigger, { isLoading }] = useDeletePhotoMutation();
+  const { data: photo } = useGetPhotoQuery(props.photo.id);
 
   const deletePhoto = () => {
     deletePhotoTrigger(props.photo.id);
@@ -31,7 +36,7 @@ const PhotoItem = (props: PhotoItemProps) => {
     <View style={styles.container}>
       <View style={[Styles.photoContainer, styles.customPhotoContainer]}>
         <Image
-          source={props.photo.image.data}
+          source={photo?.image.data ?? Images.loading}
           style={styles.image}
           contentFit="cover"
           contentPosition="center"

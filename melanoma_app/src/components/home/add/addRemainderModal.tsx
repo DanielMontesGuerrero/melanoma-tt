@@ -50,6 +50,7 @@ const AddRemainderModal = (props: AddRemainderModalProps) => {
       idLesion: selectedLesionId,
       reminder: {
         targetTimeStamp: date.toISOString(),
+        cycleLength: selectedDays * 24,
       },
     });
     props.onCancel();

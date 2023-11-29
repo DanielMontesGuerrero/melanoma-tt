@@ -1,7 +1,5 @@
 from adapters.blob_storage import download_image
-import sys
 import image_processing.processor as img_proc
-import json
 
 
 def verify_image_content(img, blobName):
@@ -9,57 +7,79 @@ def verify_image_content(img, blobName):
         result = {
                 'error': f'Error with img: {blobName} {img["error"]} ',
         }
-        print(json.dumps(result), file=sys.stderr)
-        exit(-1)
+        return result
+    return None
 
 def compare(blobNameBefore, blobNameAfter):
-    result1 = extract(blobNameBefore)
-    result2 = extract(blobNameAfter)
+    img_before = download_image(blobNameBefore)
+    err_before = verify_image_content(img_before, blobNameBefore)
+    if err_before:
+        return {
+                'status': 500,
+                'data' : err_before,
+        }
 
-    result = {
-            'result1': result1,
-            'result2': result2,
-    };
+    img_after = download_image(blobNameAfter)
+    err_after = verify_image_content(img_after, blobNameAfter)
+    if err_after:
+        return {
+                'status': 500,
+                'data' : err_after,
+        }
 
-    return json.dumps(result)
+    result = img_proc.extract_and_compare(img_before, img_after)
 
+    return {
+            'status': 200,
+            'data' : result,
+    }
 
 def classify(blobName):
     img = download_image(blobName)
-    verify_image_content(img, blobName)
+    err = verify_image_content(img, blobName)
+    if err:
+        return {
+                'status': 500,
+                'data' : err,
+        }
 
     result = {
-        'percentage' : 85.3,
-    };
-
-    return json.dumps(result)
+        'result': 0,
+    }
+    return {
+            'status' : 500 if 'error' in result else 200,
+            'data': result,
+    }
 
 def extract(blobName):
     img = download_image(blobName)
-    verify_image_content(img, blobName)
+    err = verify_image_content(img, blobName)
+    if err:
+        return {
+                'status': 500,
+                'data' : err,
+        }
+    result = img_proc.extract(img)
+    return {
+            'status': 200,
+            'data': result,
+    }
 
-    result = img_proc.extract(img['data'])
-
-    return json.dumps(result)
-
-
-def main():
-    op = sys.argv[1]
+def dispatch(op, blobNames):
     if op == 'compare':
-        blobNameBefore = sys.argv[2]
-        blobNameAfter = sys.argv[3]
-        print(compare(blobNameBefore, blobNameAfter))
+        blobNameBefore = blobNames[0]
+        blobNameAfter = blobNames[1]
+        return compare(blobNameBefore, blobNameAfter)
     elif op == 'classify':
-        blobName = sys.argv[2]
-        print(classify(blobName))
+        blobName = blobNames[0]
+        return classify(blobName)
     elif op == 'extract':
-        blobName = sys.argv[2]
-        print(extract(blobName))
+        blobName = blobNames[0]
+        return extract(blobName)
     else:
         result = {
+                'status': 400,
                 'error': 'bad request',
         }
-        print(json.dumps(result), file=sys.stderr)
+        return result
 
-if __name__ == '__main__':
-    main()

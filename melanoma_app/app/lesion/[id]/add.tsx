@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Redirect, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -5,12 +6,14 @@ import { Text, View } from "react-native";
 import ImageLoading from "@/components/imageLoading";
 import { useCurrentPictureMedia } from "@/contexts/pictureMediaContext";
 import { useUser } from "@/contexts/userContext";
+import { DefaultAppConfig } from "@/models/appConfig";
 import {
   usePostLesionMutation,
   usePostPhotoMutation,
+  usePostReminderMutation,
 } from "@/services/melanomaApi";
 import { PostLesionResponse } from "@/types/melanomaApiTypes";
-import { NEW_LESION_ID } from "@/utils/constants";
+import { APP_CONFIG, NEW_LESION_ID } from "@/utils/constants";
 
 const Add = () => {
   const params = useLocalSearchParams<{ id: string }>();
@@ -20,6 +23,7 @@ const Add = () => {
     usePostPhotoMutation();
   const [postLesionTrigger, { isLoading: isPostLesionLoading }] =
     usePostLesionMutation();
+  const [postReminderTrigger] = usePostReminderMutation();
   const [lesionId, setLesionId] = useState(
     Number(params.id) === NEW_LESION_ID ? NEW_LESION_ID : Number(params.id)
   );
@@ -41,12 +45,34 @@ const Add = () => {
     }
   };
 
+  const maybeCreateReminder = async (lesionId: number) => {
+    const appConfigString = await AsyncStorage.getItem(APP_CONFIG);
+    let config = DefaultAppConfig;
+    if (appConfigString !== null) {
+      config = JSON.parse(appConfigString);
+    }
+    if (config.shouldCreateReminderOnNewLesion) {
+      const date = new Date();
+      date.setDate(date.getDate() + config.reminderCycleLength);
+      postReminderTrigger({
+        idLesion: lesionId,
+        idUser: user?.id ?? 0,
+        reminder: {
+          targetTimeStamp: date.toISOString(),
+          cycleLength: config.reminderCycleLength * 24,
+        },
+      });
+    }
+  };
+
   useEffect(() => {
     if (lesionId === NEW_LESION_ID) {
       postLesionTrigger(user?.id ?? 0)
-        .then((response: { data: PostLesionResponse }) => {
-          setLesionId(response.data.id);
-          postPhoto(response.data.id);
+        .then((response) => {
+          const result = response as { data: PostLesionResponse };
+          setLesionId(result.data.id);
+          postPhoto(result.data.id);
+          maybeCreateReminder(result.data.id);
         })
         .catch((error) => console.log(error));
     } else {

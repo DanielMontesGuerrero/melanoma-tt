@@ -8,7 +8,10 @@ import ConfirmationModal from "../../confirmationModal";
 
 import ColorPallete from "@/colorPallete";
 import Loading from "@/components/loading";
-import { useDeleteReminderMutation } from "@/services/melanomaApi";
+import {
+  useDeleteReminderMutation,
+  useDiscardReminderMutation,
+} from "@/services/melanomaApi";
 
 interface RemainderProps {
   remainder: ReminderModel;
@@ -18,6 +21,8 @@ const Remainder = (props: RemainderProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [deleteReminderTrigger, { isLoading }] = useDeleteReminderMutation();
+  const [discardReminderTrigger, { isLoading: isDiscardLoading }] =
+    useDiscardReminderMutation();
   const isOverdue = props.remainder.date <= new Date();
 
   const deleteReminder = () => {
@@ -26,7 +31,13 @@ const Remainder = (props: RemainderProps) => {
     setIsModalVisible(false);
   };
 
-  if (isLoading) {
+  const discardReminder = () => {
+    discardReminderTrigger(props.remainder.id);
+    setIsDeleteModalVisible(false);
+    setIsModalVisible(false);
+  };
+
+  if (isLoading || isDiscardLoading) {
     return <Loading />;
   }
 
@@ -43,7 +54,7 @@ const Remainder = (props: RemainderProps) => {
         message={`Es hora de agregar un nuevo registro a ${props.remainder.lesion}`}
         confirmationTitle="Descartar"
         cancelTitle="Aplazar"
-        onConfirmation={deleteReminder}
+        onConfirmation={discardReminder}
         onCancel={() => setIsModalVisible(false)}
       />
       <ConfirmationModal

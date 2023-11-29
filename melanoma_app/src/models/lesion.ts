@@ -5,7 +5,7 @@ export default class Lesion {
   id: number;
   name: string;
   photos: Photo[];
-  sharedWithUsers: User[];
+  sharedWithUsers: Partial<User>[];
   userIsOwner: boolean;
   ownerUsername?: string;
   userHasWriteNotesPermission: boolean;
@@ -15,7 +15,7 @@ export default class Lesion {
     name: string,
     photos: Photo[],
     ownerUsername?: string,
-    sharedWithUsers?: User[],
+    sharedWithUsers?: Partial<User>[],
     userHasWriteNotesPermission?: boolean
   ) {
     this.id = id;
@@ -49,6 +49,9 @@ export interface ILesion {
   name: string;
   idUser: number;
   photos: IPhoto[];
+  owner?: Partial<User>;
+  userHasWriteNotesPermission?: boolean;
+  sharedWithUsers?: Partial<User>[];
 }
 
 export function lesionFromInterface(
@@ -59,5 +62,16 @@ export function lesionFromInterface(
   const photos = (lesion.photos ?? []).map((photo) =>
     photoFromInterface(photo)
   );
-  return new Lesion(lesion.id, lesion.name, photos, user?.userName, [], false);
+  const ownerUsername =
+    lesion.owner?.userName === user?.userName
+      ? undefined
+      : lesion.owner?.userName;
+  return new Lesion(
+    lesion.id,
+    lesion.name,
+    photos,
+    ownerUsername,
+    lesion.sharedWithUsers,
+    lesion.userHasWriteNotesPermission
+  );
 }

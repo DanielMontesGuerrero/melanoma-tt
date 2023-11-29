@@ -184,6 +184,7 @@ const LesionDetail = () => {
         onCompareSelected={compareImages}
       />
       <ShareModal
+        parentLesion={lesion}
         visible={shareModalVisible}
         onCancel={() => setShareModalVisible(false)}
       />

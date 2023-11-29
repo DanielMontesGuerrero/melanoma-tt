@@ -20,6 +20,7 @@ export interface IReminder {
   id: number;
   targetTimeStamp: string;
   lesion: Partial<ILesion>;
+  cycleLength: number;
 }
 
 export function reminderFromInterface(reminder: IReminder) {

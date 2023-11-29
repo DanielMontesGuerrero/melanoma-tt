@@ -4,6 +4,7 @@ import { StyleSheet, View } from "react-native";
 import ColorPallete from "@/colorPallete";
 import LoginMenu from "@/components/login/loginForm";
 import { useUser } from "@/contexts/userContext";
+import Styles from "@/styles";
 
 const Login = () => {
   const { user } = useUser();
@@ -20,7 +21,7 @@ const Login = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...Styles.centeredContainer,
     backgroundColor: ColorPallete.blue.dark,
   },
 });

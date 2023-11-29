@@ -10,4 +10,5 @@ export default interface User {
   hasWritePermission: boolean;
   lesions?: ILesion[];
   reminders?: IReminder[];
+  sharedLesions?: ILesion[];
 }

@@ -28,7 +28,7 @@ const LesionBody = () => {
 
   return (
     <View style={[Styles.centeredContainer, Styles.topContainer]}>
-      <View style={[Styles.cardBorder, styles.card]}>
+      <View style={[Styles.cardBorder, styles.card, { width: "100%" }]}>
         <Text>
           Toma una foto nueva para agregarla a tu registro de la lesión
           seleccionada, llevar un seguimiento de las lesiones sospechosas es

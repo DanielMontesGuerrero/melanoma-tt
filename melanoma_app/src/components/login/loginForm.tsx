@@ -15,6 +15,7 @@ import Alert from "@/Alert";
 import ColorPallete from "@/colorPallete";
 import { useUser } from "@/contexts/userContext";
 import {
+  useLazyGetUserQuery,
   useLazyPostLoginQuery,
   usePostUserMutation,
 } from "@/services/melanomaApi";
@@ -29,6 +30,7 @@ const LoginForm = ({ onRegisterPressed }: LoginFormProps) => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [postLogin, result] = useLazyPostLoginQuery();
+  const [getUser, userResult] = useLazyGetUserQuery();
   const { setUser } = useUser();
 
   const login = () => {
@@ -38,32 +40,32 @@ const LoginForm = ({ onRegisterPressed }: LoginFormProps) => {
     }
 
     postLogin({
-      id: 0,
       userName: userName.trim(),
       password: password.trim(),
-      lastName: "",
-      name: "",
-      hasWritePermission: false,
     }).then(({ data, error }) => {
       if (error != null) {
-        console.log(error);
         Alert("Error", "Error al loggear usuario");
         return;
       }
       if (data?.user?.id !== undefined) {
-        setUser({
-          name: "",
-          lastName: "",
-          password: "",
-          hasWritePermission: false,
-          ...data.user,
+        getUser(data.user.id).then(({ data: userData, error: userError }) => {
+          if (userData !== undefined) {
+            setUser({
+              id: userData.id,
+              userName: userData.userName,
+              name: userData.name,
+              lastName: userData.lastName,
+              password: "",
+              hasWritePermission: true,
+            });
+            router.replace({ pathname: "/(home)/followup" });
+          }
         });
-        router.replace({ pathname: "/(home)/followup" });
       }
     });
   };
 
-  if (result.isLoading) {
+  if (result.isLoading || userResult.isLoading) {
     return <Loading />;
   }
 

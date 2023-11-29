@@ -15,7 +15,10 @@ import { Images } from "../../../utils/images";
 
 import ConfirmationModal from "@/components/confirmationModal";
 import Loading from "@/components/loading";
-import { useDeleteLesionMutation } from "@/services/melanomaApi";
+import {
+  useDeleteLesionMutation,
+  useGetPhotoQuery,
+} from "@/services/melanomaApi";
 
 interface LesionProps {
   lesion: LesionModel;
@@ -26,6 +29,12 @@ const LesionItem = (props: LesionProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [deleteLesionTrigger, result] = useDeleteLesionMutation();
   const thumbnail = getFirstPhoto(props.lesion);
+  const { data: photo } = useGetPhotoQuery(thumbnail?.id ?? -1);
+
+  const getPhotoPreview = () => {
+    if (props.lesion.photos.length === 0) return Images.noImage;
+    return photo?.image.data ?? Images.loading;
+  };
 
   const deleteLesion = () => {
     deleteLesionTrigger(props.lesion.id);
@@ -39,7 +48,7 @@ const LesionItem = (props: LesionProps) => {
     <View style={styles.container}>
       <View style={[Styles.photoContainer, styles.customPhotoContainer]}>
         <Image
-          source={thumbnail?.image.data ?? Images.noImage}
+          source={getPhotoPreview()}
           style={styles.image}
           contentFit="cover"
           contentPosition="center"

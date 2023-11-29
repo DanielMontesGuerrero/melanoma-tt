@@ -6,6 +6,8 @@ import { IReminder } from "@/models/reminder";
 import User from "@/models/user";
 import {
   ApiResponse,
+  CompareResponse,
+  DoctorAssociationRequest,
   PostLesionResponse,
   PostLoginResponse,
   PostUserResponse,
@@ -15,7 +17,10 @@ const baseUrl = process.env.EXPO_PUBLIC_MELANOMA_API_URL;
 
 export const melanomaApi = createApi({
   reducerPath: "melanomaApi",
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery({
+    baseUrl,
+    mode: "cors",
+  }),
   tagTypes: ["User", "Lesion", "Photo", "Reminder"],
   endpoints: (builder) => ({
     postUser: builder.mutation<PostUserResponse, Partial<User>>({
@@ -41,7 +46,7 @@ export const melanomaApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
-    postLogin: builder.query<PostLoginResponse, User>({
+    postLogin: builder.query<PostLoginResponse, Partial<User>>({
       query: (user) => ({
         url: "user/login",
         method: "post",
@@ -52,14 +57,23 @@ export const melanomaApi = createApi({
       query: (userId) => `user/${userId}`,
       providesTags: ["User", "Lesion", "Reminder"],
       transformResponse: (data: User) => {
-        const lesions = data.lesions?.map((lesion) => {
+        const userLesions = (data.lesions ?? []).map((lesion) => {
           return {
             sharedWithUsers: [],
-            userHasWriteNotesPermission: false,
+            userHasWriteNotesPermission: true,
             userIsOwner: true,
             ...lesion,
           };
         });
+        const sharedLesions = (data.sharedLesions ?? []).map((lesion) => {
+          return {
+            sharedWithUsers: [],
+            userHasWriteNotesPermission: false,
+            userIsOwner: false,
+            ...lesion,
+          };
+        });
+        const lesions = [...userLesions, ...sharedLesions];
         return {
           ...data,
           lesions,
@@ -149,6 +163,45 @@ export const melanomaApi = createApi({
       }),
       invalidatesTags: ["Reminder"],
     }),
+    discardReminder: builder.mutation<ApiResponse, number>({
+      query: (reminderId) => ({
+        url: `user/0/reminder/${reminderId}/discard`,
+        method: "post",
+      }),
+      invalidatesTags: ["Reminder"],
+    }),
+    postDoctorAssociation: builder.mutation<
+      ApiResponse,
+      DoctorAssociationRequest
+    >({
+      query: ({ userId, doctorUserName, lesionId }) => ({
+        url: `user/${userId}/associate/${doctorUserName}/${lesionId}`,
+        method: "post",
+      }),
+      invalidatesTags: ["Lesion"],
+    }),
+    deleteDoctorAssociation: builder.mutation<
+      ApiResponse,
+      DoctorAssociationRequest
+    >({
+      query: ({ userId, doctorUserName, lesionId }) => ({
+        url: `user/${userId}/associate/${doctorUserName}/${lesionId}`,
+        method: "delete",
+      }),
+      invalidatesTags: ["Lesion"],
+    }),
+    postCompare: builder.query<
+      CompareResponse,
+      { before: string; after: string }
+    >({
+      query: ({ before, after }) => ({
+        url: "operation/analyze/compare",
+        method: "post",
+        body: {
+          blobNames: [before, after],
+        },
+      }),
+    }),
   }),
 });
 
@@ -170,4 +223,8 @@ export const {
   usePostLesionMutation,
   usePatchUserMutation,
   useDeleteUserMutation,
+  usePostDoctorAssociationMutation,
+  useDeleteDoctorAssociationMutation,
+  useDiscardReminderMutation,
+  usePostCompareQuery,
 } = melanomaApi;

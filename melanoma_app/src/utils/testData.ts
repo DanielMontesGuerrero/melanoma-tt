@@ -6,16 +6,17 @@ import Reminder from "../models/reminder";
 
 import Comparison from "@/models/comparison";
 import PrediagnosisResult from "@/models/prediagnosisResult";
+import User from "@/models/user";
 
 export function getRemainders() {
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
   const remainders = [
-    new Reminder("Brazo", today),
-    new Reminder("Pierna", today),
-    new Reminder("Estomago", tomorrow),
-    new Reminder("Mano derecha", tomorrow),
+    new Reminder(0, "Brazo", today),
+    new Reminder(1, "Pierna", today),
+    new Reminder(2, "Estomago", tomorrow),
+    new Reminder(3, "Mano derecha", tomorrow),
   ];
   return remainders;
 }
@@ -31,18 +32,26 @@ export function getPhotos(count: number) {
         `photo${i}`,
         id,
         new Date(Date.now() - Math.random() * 10000000000),
-        description
+        description,
+        { name: "", data: "", ext: "" }
       )
     );
   }
   return photos;
 }
 
-export function getUsers(count: number) {
+export function getUsers(count: number): User[] {
   const baseUsers = ["Daniel", "Esteban", "Gabriel"];
   const users = [];
   for (let i = 0; i < count; i++) {
-    users.push({ username: baseUsers[i % 3], hasWritePermission: i % 2 === 0 });
+    users.push({
+      userName: baseUsers[i % 3],
+      hasWritePermission: i % 2 === 0,
+      id: 0,
+      password: "",
+      name: "",
+      lastName: "",
+    });
   }
   return users;
 }
@@ -70,9 +79,9 @@ export function getComparison(
   const beforeValue = 98;
   const afterValue = 93;
   return new Comparison(
-    photos[0],
-    photos[1],
-    photos[2],
+    "",
+    "",
+    "",
     "Las lesiones de cáncer de melanoma tienen un alto procentaje de asimetría.",
     parameterName,
     beforeValue,
