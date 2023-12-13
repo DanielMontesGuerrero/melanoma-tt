@@ -6,6 +6,7 @@ import { IReminder } from "@/models/reminder";
 import User from "@/models/user";
 import {
   ApiResponse,
+  ClassifyResponse,
   CompareResponse,
   DoctorAssociationRequest,
   PostLesionResponse,
@@ -202,6 +203,15 @@ export const melanomaApi = createApi({
         },
       }),
     }),
+    postClassify: builder.query<ClassifyResponse, string>({
+      query: (blob) => ({
+        url: "operation/analyze/classify",
+        method: "post",
+        body: {
+          blobNames: [blob],
+        },
+      }),
+    }),
   }),
 });
 
@@ -227,4 +237,6 @@ export const {
   useDeleteDoctorAssociationMutation,
   useDiscardReminderMutation,
   usePostCompareQuery,
+  usePostClassifyQuery,
+  useLazyPostClassifyQuery,
 } = melanomaApi;

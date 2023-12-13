@@ -4,19 +4,26 @@ import { Text, View } from "react-native";
 
 import ImageLoading from "@/components/imageLoading";
 import { useCurrentPictureMedia } from "@/contexts/pictureMediaContext";
+import { usePrediagnosisResult } from "@/contexts/prediagnosisResultContext";
+import { usePostClassifyQuery } from "@/services/melanomaApi";
 
 const Analyze = () => {
   const { currentPictureMedia } = useCurrentPictureMedia();
+  const { setResult } = usePrediagnosisResult();
+  const { isLoading, data } = usePostClassifyQuery(
+    currentPictureMedia.base64 ?? ""
+  );
 
   useEffect(() => {
-    setTimeout(() => {
+    if (!isLoading && data !== undefined) {
+      setResult(data);
       router.replace({
         pathname: "/prediagnosis/result",
       });
-    }, 3000);
-  }, []);
+    }
+  }, [isLoading, data]);
 
-  if (!currentPictureMedia.uri) {
+  if (!currentPictureMedia.uri && !currentPictureMedia.base64) {
     console.error("No picture media provided");
 
     return (

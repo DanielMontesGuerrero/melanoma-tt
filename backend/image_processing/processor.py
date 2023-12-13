@@ -1,16 +1,34 @@
-from .comparison_img import compare_color_score_palletes, compare_contour, compare_symetry
-from .util import converter
-from .util import noise_removal
-from . import feature_extraction
+import logging
 
-def process_image(img):
+import cv2
+
+from sam_segmentation.segment import segment_online
+
+from . import feature_extraction
+from .comparison_img import (compare_color_score_palletes, compare_contour,
+                             compare_symetry)
+from .util import converter, noise_removal
+
+
+def remove_hair(img):
     processed_img, _ = noise_removal.dull_razor(img)
     blurred_img = noise_removal.median_filtering(processed_img)
-    segmented_image = noise_removal.otsu_method(blurred_img)
+    return blurred_img
+
+
+def segment_ots(img):
+    segmented_image = noise_removal.otsu_method(img)
     enclosed_image = noise_removal.closing(segmented_image)
-    enclosed_image = noise_removal.opening(noise_removal.invert_bitwise(enclosed_image))
-    segmented_color = noise_removal.and_bitwise(blurred_img, enclosed_image)
-    return [segmented_color, enclosed_image]
+    enclosed_image = noise_removal.opening(
+        noise_removal.invert_bitwise(enclosed_image))
+    return enclosed_image
+
+
+def process_image(img):
+    blurred_img = remove_hair(img)
+    segmented_image, _ = segment_online(blurred_img)
+    segmented_color = noise_removal.and_bitwise(blurred_img, segmented_image)
+    return [segmented_color, segmented_image]
 
 
 def extract(img):
@@ -18,23 +36,27 @@ def extract(img):
     [processed_img, msk] = process_image(img_cv2)
 
     return {
-            'roughness' : feature_extraction.get_roughness(msk),
-            'color': feature_extraction.get_color_score(processed_img, msk),
-            'symetry' : feature_extraction.get_simetry(msk),
+        'roughness': feature_extraction.get_roughness(msk),
+        'color': feature_extraction.get_color_score(processed_img, msk),
+        'symetry': feature_extraction.get_simetry(msk),
     }
+
 
 def extract_and_compare(img_base64_before, img_base64_after):
     img_before = converter.convertToOpenCVFormat(img_base64_before)
     img_after = converter.convertToOpenCVFormat(img_base64_after)
     [processed_before, msk_before] = process_image(img_before)
     [processed_after, msk_after] = process_image(img_after)
+    logging.info("Proccessed images")
 
     features_before = extract(img_base64_before)
     features_after = extract(img_base64_after)
 
     sym_before, sym_after, sym_compare = compare_symetry(msk_before, msk_after)
-    contour_before, contour_after, contour_compare = compare_contour((processed_before, msk_before), (processed_after, msk_after))
-    pallete_before, pallete_after, pallete_compare = compare_color_score_palletes((processed_before, msk_before), (processed_after, msk_after))
+    contour_before, contour_after, contour_compare = compare_contour(
+        (processed_before, msk_before), (processed_after, msk_after))
+    pallete_before, pallete_after, pallete_compare = compare_color_score_palletes(
+        (processed_before, msk_before), (processed_after, msk_after))
 
     return {
         'features': {

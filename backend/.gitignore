@@ -26,6 +26,9 @@ node_modules
 dist
 .vscode
 
+*.pth
+./sam_segmentation/sam_vit_h_4b8939.pth
+
 # Local python packages
 .python_packages/
 

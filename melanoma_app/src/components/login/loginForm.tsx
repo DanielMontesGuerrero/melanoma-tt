@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { CheckBox } from "react-native-elements";
 
 import Button from "../button";
 import Loading from "../loading";
@@ -117,6 +118,7 @@ const RegisterForm = ({ onLoginPressed }: RegisterFormProps) => {
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
+  const [isDoctor, setIsDoctor] = useState(false);
   const [postUser, result] = usePostUserMutation();
 
   const register = () => {
@@ -129,6 +131,7 @@ const RegisterForm = ({ onLoginPressed }: RegisterFormProps) => {
       name: name.trim(),
       lastName: lastName.trim(),
       password: password.trim(),
+      isDoctor,
     });
   };
 
@@ -173,6 +176,11 @@ const RegisterForm = ({ onLoginPressed }: RegisterFormProps) => {
           onChangeText={(val) => setPassword(val)}
         />
       </View>
+      <CheckBox
+        title="Soy un doctor"
+        checked={isDoctor}
+        onPress={() => setIsDoctor(!isDoctor)}
+      />
       <View style={[Styles.buttonsContainer, Styles.horizontalContainer]}>
         <Button
           title="Registrarse"

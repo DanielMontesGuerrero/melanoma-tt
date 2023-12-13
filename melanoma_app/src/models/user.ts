@@ -8,6 +8,7 @@ export default interface User {
   name: string;
   lastName: string;
   hasWritePermission: boolean;
+  isDoctor?: boolean;
   lesions?: ILesion[];
   reminders?: IReminder[];
   sharedLesions?: ILesion[];

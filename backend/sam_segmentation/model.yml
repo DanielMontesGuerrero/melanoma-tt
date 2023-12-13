@@ -1,0 +1,5 @@
+$schema: https://azuremlschemas.azureedge.net/latest/model.schema.json
+
+name: sam
+version: 1
+path: "./sam_vit_h_4b8939.pth"

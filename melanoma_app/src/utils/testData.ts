@@ -75,7 +75,6 @@ export function getComparison(
   afterId: number,
   parameterName: string
 ) {
-  const photos = getPhotos(3);
   const beforeValue = 98;
   const afterValue = 93;
   return new Comparison(

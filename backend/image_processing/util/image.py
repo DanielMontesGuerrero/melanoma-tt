@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 import os
+from dataclasses import dataclass
 
 
 @dataclass
@@ -38,4 +38,16 @@ TEST_IMAGES = [
     #               True, 'LMM7_contour.png'),  # fails
     # ImageMetadata(IMAGES_PATH, 'LMM8_2_orig.jpg', IMG_SIZE,
     #               True, 'LMM8_2_contour.png'),  # fails
+    ImageMetadata(IMAGES_PATH, 'photo1.jpg',
+                  IMG_SIZE, False),
+    ImageMetadata(IMAGES_PATH, 'photo2.jpg',
+                  IMG_SIZE, False),
+    ImageMetadata(IMAGES_PATH, 'photo3.jpg',
+                  IMG_SIZE, False),
+    ImageMetadata(IMAGES_PATH, 'photo4.jpg',
+                  IMG_SIZE, False),
+    ImageMetadata(IMAGES_PATH, 'photo5.jpg',
+                  IMG_SIZE, False),
+    ImageMetadata(IMAGES_PATH, 'photo6.jpg',
+                  IMG_SIZE, False),
 ]

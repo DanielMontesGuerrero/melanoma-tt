@@ -38,13 +38,17 @@ const ImageGetter = () => {
     const result = await launchImageLibraryAsync({
       mediaTypes: MediaTypeOptions.Images,
       quality: 1,
+      base64: true,
     });
 
     if (result.canceled) {
       return;
     }
 
-    setCurrentPictureMedia({ uri: result.assets[0].uri });
+    setCurrentPictureMedia({
+      uri: result.assets[0].uri,
+      base64: "data:image/jpg;base64," + result.assets[0].base64,
+    });
 
     router.push({
       pathname: "/prediagnosis/analyze",

@@ -51,3 +51,8 @@ export interface CompareResponse {
   features: Features;
   imgs: Images;
 }
+
+export interface ClassifyResponse {
+  img: string;
+  score: number;
+}

@@ -21,6 +21,7 @@ defaults: &defaults
       tenantId:
     applicationinsights:
       connectionString:
+    samEndpoint: https://cnn-evxik.eastus2.inference.ml.azure.com/score
 
 development:
   <<: *defaults

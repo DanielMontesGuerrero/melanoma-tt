@@ -1,21 +1,22 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import PrediagnosisResult from "@/models/prediagnosisResult";
 import Styles from "@/styles";
+import { ClassifyResponse } from "@/types/melanomaApiTypes";
 
 interface ResultDescriptionProps {
-  result: PrediagnosisResult;
+  result: ClassifyResponse;
 }
 
 const ResultDescription = (props: ResultDescriptionProps) => {
   return (
     <View style={styles.result}>
-      <Text
-        style={Styles.textBody}
-      >{`Probabilidad de cáncer de melanoma: ${props.result.probability}`}</Text>
-      <Text
-        style={[Styles.textBody, { marginTop: 10 }]}
-      >{`Descripción: ${props.result.description}`}</Text>
+      <Text style={Styles.textBody}>{`Probabilidad de cáncer de melanoma: ${(
+        props.result.score * 100
+      ).toFixed(2)}%`}</Text>
+      <Text style={[Styles.textBody, { marginTop: 10 }]}>
+        Descripción: Si el resultado es mayor al 80% consulte a su médico
+        inmediatamente
+      </Text>
     </View>
   );
 };

@@ -3,11 +3,11 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import ResultDescription from "@/components/prediagnosis/resultDescription";
 import Section from "@/components/section";
 import ZoomeableImage from "@/components/zoomeableImage";
+import { usePrediagnosisResult } from "@/contexts/prediagnosisResultContext";
 import Styles from "@/styles";
-import { getPrediagnosisResult } from "@/utils/testData";
 
 const Result = () => {
-  const result = getPrediagnosisResult();
+  const { result } = usePrediagnosisResult();
 
   const Body = () => {
     return ResultDescription({ result });
@@ -16,10 +16,7 @@ const Result = () => {
   return (
     <View style={Styles.flexContainer}>
       <View style={styles.imageContainer}>
-        <ZoomeableImage
-          style={styles.image}
-          image={{ uri: result.segementedLesion.base64 }}
-        />
+        <ZoomeableImage style={styles.image} image={result.img} />
       </View>
       <ScrollView style={styles.resultContainer}>
         <Section title="Resultados" body={Body} />

@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 
 api/config/common.yml
+
+backend/image_processing/util/sam_vit_h_4b8939.pth

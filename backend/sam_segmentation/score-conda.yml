@@ -1,0 +1,20 @@
+name: managed-endpoint-score
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python==3.9
+  - pytorch
+  - git
+  - py-opencv
+  - pip
+  - pip:
+    - azureml-defaults
+    - numpy
+    - git+https://github.com/facebookresearch/segment-anything.git@6fdee8f2727f4506cfbbe553e23b895e27956588#egg=segment-anything
+    - opencv-contrib-python
+    - opencv-python
+    - pandas
+    - torchvision
+    - torch-summary

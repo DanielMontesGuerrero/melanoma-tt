@@ -27,10 +27,10 @@ export const makeHttpRequest = async (
     const cmd = options.params.cmd;
     const { data, status }: AxiosResponse<Operation> = await axios.post(
       azFunc,
-      {
+      JSON.stringify({
         op: cmd.cmd,
         blobNames: [cmd.blobNameBefore, cmd.blobNameAfter],
-      },
+      }),
       {
         headers: {
           'Content-Type': 'application/json',

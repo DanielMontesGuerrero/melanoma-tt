@@ -1,6 +1,6 @@
 export default interface PictureMedia {
   uri?: string;
-  base64?: string;
+  base64?: string | null;
 }
 
 export interface Image {

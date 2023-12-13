@@ -1,0 +1,12 @@
+$schema: https://azuremlschemas.azureedge.net/latest/managedOnlineDeployment.schema.json
+name: sam
+endpoint_name: sam-segmentation
+model: azureml:sam:1
+code_configuration:
+  code: ../
+  scoring_script: ./sam_segmentation/segment.py
+environment:
+  conda_file: score-conda.yml
+  image: mcr.microsoft.com/azureml/curated/minimal-ubuntu20.04-py38-cuda11.6.2-gpu-inference:20
+instance_type: Standard_D2as_v4
+instance_count: 1
